@@ -290,12 +290,15 @@ class Usad(BaseDetector):
                 w1 , w2 , w3  = self.model_(batch)          
                 loss1 = 1/float(epoch+1)*torch.mean((batch-w1)**2)+(1-1/float(epoch+1))*torch.mean((batch-w3)**2)
                 loss2 = 1/float(epoch+1)*torch.mean((batch-w2)**2)-(1-1/float(epoch+1))*torch.mean((batch-w3)**2)
+                
                 loss1.backward(retain_graph=True)
-                loss2.backward()
                 optimizer1.step()
-                optimizer2.step()
                 optimizer1.zero_grad()
+                
+                loss2.backward()
+                optimizer2.step()
                 optimizer2.zero_grad()
+                
                 losses1.append(loss1.item())
                 losses2.append(loss2.item())
             self.history_.append("Epoch [{}], val_loss1: {:.4f}, val_loss2: {:.4f}".format(epoch, mean(losses1), mean(losses2)))
